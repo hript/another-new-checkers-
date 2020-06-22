@@ -22,24 +22,26 @@ void showField(Checker** field) {
 	system("cls");
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < SIZE; j++) {
-			if (field[i][j].isWhite == true) {
-				if (field[i][j].isQueen == true) {
-					HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-					SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 12));
+			if (field[i][j].isEmpty == false) {
+				if (field[i][j].isWhite == true) {
+					if (field[i][j].isQueen == true) {
+						HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+						SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 12));
+					}
+					else {
+						HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+						SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 4));
+					}
 				}
 				else {
-					HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-					SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 4));
-				}
-			}
-			else {
-				if (field[i][j].isQueen == true) {
-					HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-					SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 1));
-				}
-				else {
-					HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-					SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 0));
+					if (field[i][j].isQueen == true) {
+						HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+						SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 1));
+					}
+					else {
+						HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+						SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 0));
+					}
 				}
 			}
 			cout << field[i][j].space << " ";
@@ -112,24 +114,39 @@ bool correctMove(Checker** field, int nowRow, int nowColumn, int nextRow, int ne
 	return true;
 }
 
+bool yourChecker(Checker** field, int row, int column, int numPlayer) {
+	if (numPlayer % 2 == field[row][column].isWhite) {
+		return true;
+	}
+	return false;
+}
+
 bool canMove(Checker** field, int row, int column, int numPlayer) {
+	if (yourChecker(field, row, column, numPlayer) == false) {
+		cout << "This is not your checker" << endl;
+		return false;
+	}
 	if (field[row][column].isEmpty == true) {
 		return false;
 	}
 	if (numPlayer % 2 != field[row][column].isWhite) {
 		return false;
 	}
-	if (row - 1 > 0 && column - 1 > 0 && field[row - 1][column - 1].isEmpty == true) {
-		return true;
+	if (field[row][column].isWhite == true) {
+		if (row - 1 > 0 && column - 1 > 0 && field[row - 1][column - 1].isEmpty == true) {
+			return true;
+		}
+		if (row + 1 < SIZE && column - 1 > 0 && field[row + 1][column - 1].isEmpty == true) {
+			return true;
+		}
 	}
-	if (row - 1 > 0 && column + 1 < SIZE && field[row - 1][column + 1].isEmpty == true) {
-		return true;
-	}
-	if (row + 1 < SIZE && column - 1 > 0 && field[row + 1][column - 1].isEmpty == true) {
-		return true;
-	}
-	if (row + 1 < SIZE && column + 1 < SIZE && field[row + 1][column + 1].isEmpty == true) {
-		return true;
+	else {
+		if (row - 1 > 0 && column + 1 < SIZE && field[row - 1][column + 1].isEmpty == true) {
+			return true;
+		}
+		if (row + 1 < SIZE && column + 1 < SIZE && field[row + 1][column + 1].isEmpty == true) {
+			return true;
+		}
 	}
 	return false;
 }

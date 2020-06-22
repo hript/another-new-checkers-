@@ -92,13 +92,10 @@ bool correctMove(Checker** field, int nowRow, int nowColumn, int nextRow, int ne
 	if (nextRow >= SIZE || nextColumn >= SIZE || nextRow < 1 || nextColumn < 1) {
 		return false;
 	}
-	if (field[nextRow][nextColumn].isEmpty == false) {
+	if (field[nextRow][nextColumn].isEmpty == false || nowRow == nextRow && nowColumn == nextColumn) {
 		return false;
 	}
 	if (abs(nowRow - nextRow) > 1 && abs(nowColumn - nextColumn) > 1) {
-		return false;
-	}
-	if (nowRow == nextRow && nowColumn == nextColumn) {
 		return false;
 	}
 	if (field[nowRow][nowColumn].isWhite == true) {
@@ -125,10 +122,7 @@ bool canMove(Checker** field, int row, int column, int numPlayer) {
 	if (yourChecker(field, row, column, numPlayer) == false) {
 		return false;
 	}
-	if (field[row][column].isEmpty == true) {
-		return false;
-	}
-	if (numPlayer % 2 != field[row][column].isWhite) {
+	if (field[row][column].isEmpty == true || numPlayer % 2 != field[row][column].isWhite) {
 		return false;
 	}
 	if (field[row][column].isWhite == true) {
@@ -148,6 +142,94 @@ bool canMove(Checker** field, int row, int column, int numPlayer) {
 		}
 	}
 	return false;
+}
+
+bool enemyOnWayChecker(Checker** field, int nowRow, int nowColumn, int nextRow, int nextColumn) {
+	if (abs(nowRow - nextRow) == 2 && abs(nowColumn - nextColumn) == 2 && !field[nowRow][nowColumn].isEmpty) {
+		if (nextColumn > 0 && nextRow > 0 && nextColumn < SIZE && nextRow < SIZE) {
+			if (field[nextRow][nextColumn].isEmpty) {
+				if (nowRow < nextRow && nowColumn < nextColumn && !field[nowRow + 1][nowColumn + 1].isEmpty) {
+					if (field[nowRow][nowColumn].isWhite != field[nowRow + 1][nowColumn + 1].isWhite) {
+						return true;
+					}
+				}
+				if (nowRow < nextRow && nowColumn > nextColumn && !field[nowRow + 1][nowColumn - 1].isEmpty) {
+					if (field[nowRow][nowColumn].isWhite != field[nowRow + 1][nowColumn - 1].isWhite) {
+						return true;
+					}
+				}
+				if (nowRow > nextRow && nowColumn > nextColumn && !field[nowRow - 1][nowColumn - 1].isEmpty) {
+					if (field[nowRow - 1][nowColumn - 1].isWhite != field[nowRow][nowColumn].isWhite) {
+						return true;
+					}
+				}
+				if (nowRow > nextRow && nowColumn < nextColumn && !field[nowRow - 1][nowColumn + 1].isEmpty) {
+					if (field[nowRow - 1][nowColumn + 1].isWhite != field[nowRow][nowColumn].isWhite) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+}
+
+bool canHitChecker(Checker** field, int row, int column, int numPlayer) {
+	if (field[row][column].isEmpty) {
+		return false;
+	}
+	for (int i = row - 2; i <= row + 2; i++) {
+		for (int j = row - 2; j <= row + 2; j++) {
+			if (field[i][j].isWhite == numPlayer % 2) {
+				if (i - 2 > 0 && j - 2 > 0) {
+					if (enemyOnWayChecker(field, row, column, i - 2, j - 2)) {
+						return true;
+					}
+				}
+				if (i - 2 > 0 && j + 2 < SIZE) {
+					if (enemyOnWayChecker(field, row, column, i - 2, j + 2)) {
+						return true;
+					}
+				}
+				if (i + 2 < SIZE && j - 2 > 0) {
+					if (enemyOnWayChecker(field, row, column, i + 2, j - 2)) {
+						return true;
+					}
+				}
+				if (i + 2 < SIZE && j + 2 < SIZE) {
+					if (enemyOnWayChecker(field, row, column, i + 2, j + 2)) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+}
+
+void kill(Checker** field, int nowRow, int nowColumn, int nextRow, int nextColumn) {
+	if (nowRow < nextRow && nowColumn < nextColumn && !field[nowRow + 1][nowColumn + 1].isEmpty) {
+		if (field[nowRow][nowColumn].isWhite != field[nowRow + 1][nowColumn + 1].isWhite) {
+			field[nowRow + 1][nowColumn + 1].isEmpty = true;
+			field[nowRow + 1][nowColumn + 1].space = EMPTY;
+		}
+	}
+	if (nowRow < nextRow && nowColumn > nextColumn && !field[nowRow + 1][nowColumn - 1].isEmpty) {
+		if (field[nowRow][nowColumn].isWhite != field[nowRow + 1][nowColumn - 1].isWhite) {
+			field[nowRow + 1][nowColumn - 1].isEmpty = true;
+			field[nowRow + 1][nowColumn - 1].space = EMPTY;
+		}
+	}
+	if (nowRow > nextRow && nowColumn > nextColumn && !field[nowRow - 1][nowColumn - 1].isEmpty) {
+		if (field[nowRow - 1][nowColumn - 1].isWhite != field[nowRow][nowColumn].isWhite) {
+			field[nowRow - 1][nowColumn - 1].isEmpty = true;
+			field[nowRow - 1][nowColumn - 1].space = EMPTY;
+		}
+	}
+	if (nowRow > nextRow && nowColumn < nextColumn && !field[nowRow - 1][nowColumn + 1].isEmpty) {
+		if (field[nowRow - 1][nowColumn + 1].isWhite != field[nowRow][nowColumn].isWhite) {
+			field[nowRow - 1][nowColumn + 1].isEmpty = true;
+			field[nowRow - 1][nowColumn + 1].space = EMPTY;
+		}
+	}
 }
 
 int main() {
@@ -178,23 +260,29 @@ int main() {
 		
 		cout << "Choose fighting checker" << endl;
 		cin >> nowRow >> nowColumn;
-		while (canMove(field, nowRow, nowColumn, numPlayer) == false) {
+		while (!canMove(field, nowRow, nowColumn, numPlayer) && !canHitChecker(field, nowRow, nowColumn, numPlayer)) {
 			cout << "This checker can't run now. Try another one" << endl;
 			cin >> nowRow >> nowColumn;
 		}
 
 		cout << "Choose next position" << endl;
 		cin >> nextRow >> nextColumn;
-		while (correctMove(field, nowRow, nowColumn, nextRow, nextColumn) == false) {
+		while (!correctMove(field, nowRow, nowColumn, nextRow, nextColumn) && !enemyOnWayChecker(field, nowRow, nowColumn, nextRow, nextColumn)) {
 			if (yourChecker(field, nowRow, nowColumn, numPlayer)) {
 				cout << "This checker can't run like that. Try again" << endl;
 			}
-			else {
+			else if (!yourChecker(field, nowRow, nowColumn, numPlayer)) {
 				cout << "This is not your checker" << endl;
+			}
+			else {
+				cout << "Too far distance" << endl;
 			}
 			cin >> nextRow >> nextColumn;
 		}
 		moveChecker(field, nowRow, nowColumn, nextRow, nextColumn);
+		if (enemyOnWayChecker(field, nowRow, nowColumn, nextRow, nextColumn)) {
+			kill(field, nowRow, nowColumn, nextRow, nextColumn);
+		}
 		numPlayer += 1;
 	}
 

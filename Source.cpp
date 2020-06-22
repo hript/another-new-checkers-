@@ -123,7 +123,6 @@ bool yourChecker(Checker** field, int row, int column, int numPlayer) {
 
 bool canMove(Checker** field, int row, int column, int numPlayer) {
 	if (yourChecker(field, row, column, numPlayer) == false) {
-		cout << "This is not your checker" << endl;
 		return false;
 	}
 	if (field[row][column].isEmpty == true) {
@@ -136,15 +135,15 @@ bool canMove(Checker** field, int row, int column, int numPlayer) {
 		if (row - 1 > 0 && column - 1 > 0 && field[row - 1][column - 1].isEmpty == true) {
 			return true;
 		}
-		if (row + 1 < SIZE && column - 1 > 0 && field[row + 1][column - 1].isEmpty == true) {
+		if (row - 1 > 0 && column + 1 < SIZE && field[row - 1][column + 1].isEmpty == true) {
 			return true;
 		}
 	}
 	else {
-		if (row - 1 > 0 && column + 1 < SIZE && field[row - 1][column + 1].isEmpty == true) {
+		if (row + 1 < SIZE && column + 1 < SIZE && field[row + 1][column + 1].isEmpty == true) {
 			return true;
 		}
-		if (row + 1 < SIZE && column + 1 < SIZE && field[row + 1][column + 1].isEmpty == true) {
+		if (row + 1 < SIZE && column - 1 > 0 && field[row + 1][column - 1].isEmpty == true) {
 			return true;
 		}
 	}
@@ -187,7 +186,12 @@ int main() {
 		cout << "Choose next position" << endl;
 		cin >> nextRow >> nextColumn;
 		while (correctMove(field, nowRow, nowColumn, nextRow, nextColumn) == false) {
-			cout << "This checker can't run like that. Try again" << endl;
+			if (yourChecker(field, nowRow, nowColumn, numPlayer)) {
+				cout << "This checker can't run like that. Try again" << endl;
+			}
+			else {
+				cout << "This is not your checker" << endl;
+			}
 			cin >> nextRow >> nextColumn;
 		}
 		moveChecker(field, nowRow, nowColumn, nextRow, nextColumn);

@@ -172,10 +172,12 @@ bool correctMoveChecker(Checker field[SIZE][SIZE], int nowRow, int nowColumn, in
 	return false;
 }
 
-void moveChecker(Checker field[SIZE][SIZE], int nowRow, int nowColumn, int nextRow, int nextColumn) {
-	field[nextRow][nextColumn] = field[nowRow][nowColumn];
-	field[nowRow][nowColumn].isEmpty = true;
-	field[nowRow][nowColumn].space = EMPTY;
+void moveChecker(Checker field[SIZE][SIZE], int* nowRow, int* nowColumn, int nextRow, int nextColumn) {
+	field[nextRow][nextColumn] = field[*nowRow][*nowColumn];
+	field[*nowRow][*nowColumn].isEmpty = true;
+	field[*nowRow][*nowColumn].space = EMPTY;
+	*nowRow = nextRow;
+	*nowColumn = nextColumn;
 }
 
 bool out(Checker field[SIZE][SIZE]) {
@@ -198,6 +200,15 @@ bool out(Checker field[SIZE][SIZE]) {
 	return false;
 }
 
+void whoMoves(int numPlayer, string first, string second) {
+	if (numPlayer % 2 != 0) {
+		cout << first << " turn!" << endl;
+	}
+	else {
+		cout << second << " turn!" << endl;
+	}
+}
+
 int main() {
 	system("color F0");
 	Checker field[SIZE][SIZE];
@@ -217,12 +228,7 @@ int main() {
 		showField(field);
 		isHit = false;
 
-		if (numPlayer % 2 != 0) {
-			cout << firstPlayer << " turn!" << endl;
-		}
-		else {
-			cout << secondPlayer << " turn!" << endl;
-		}
+		whoMoves(numPlayer, firstPlayer, secondPlayer);
 
 		if (shouldHitChecker(field, numPlayer)) {
 			cout << "One of your checkers should hit. Choose this checker" << endl;
@@ -239,20 +245,34 @@ int main() {
 			} while (field[nowRow][nowColumn].isEmpty || !isCanHit(field, nowRow, nowColumn, -1, -1, isHit));
 
 			cout << "Choose next position" << endl;
+			system("pause");
 
-			isHit = true;
-			bool outFromWhile = false;
+			bool firstTime = true;
 			do {
-				cin >> nextRow >> nextColumn;
-				nextRow -= 1;
-				nextColumn -= 1;
-				if (!isCanHit(field, nowRow, nowColumn, nextRow, nextColumn, isHit)) {
-					cout << "You should eat! Choose another next position" << endl;
+				showField(field);
+				whoMoves(numPlayer, firstPlayer, secondPlayer);
+				if (!firstTime) {
+					cout << "Eat one more time" << endl;
 				}
-				else {
-					outFromWhile = true;
-				}
-			} while (!outFromWhile);
+				firstTime = false;
+
+				isHit = true;
+				bool outFromWhile = false;
+				do {
+					cin >> nextRow >> nextColumn;
+					nextRow -= 1;
+					nextColumn -= 1;
+					if (!isCanHit(field, nowRow, nowColumn, nextRow, nextColumn, isHit)) {
+						cout << "You should eat! Choose another next position" << endl;
+					}
+					else {
+						outFromWhile = true;
+					}
+				} while (!outFromWhile);
+				moveChecker(field, &nowRow, &nowColumn, nextRow, nextColumn);
+				
+				isHit = false;
+			} while (isCanHit(field, nowRow, nowColumn, nextRow, nextColumn, isHit));
 		}
 		else {
 			cout << "Choose fighting checker" << endl;
@@ -282,8 +302,8 @@ int main() {
 					cout << "You can't move like that" << endl;
 				}
 			} while (!correctMoveChecker(field, nowRow, nowColumn, nextRow, nextColumn));
+			moveChecker(field, &nowRow, &nowColumn, nextRow, nextColumn);
 		}
-		moveChecker(field, nowRow, nowColumn, nextRow, nextColumn);
 		numPlayer += 1;
 	}
 

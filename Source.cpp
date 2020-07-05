@@ -210,60 +210,61 @@ bool isCanHitQueen(Checker field[SIZE][SIZE], int nowRow, int nowColumn, int nex
 		}
 	}
 	return false; */
-
-	for (int i = 1; i < SIZE; i++) {
-		int row = nowRow + i;
-		int column = nowColumn + i;
-		if (row >= 0 && column >= 0 && row < SIZE && column < SIZE) {
-			if (!field[row][column].isEmpty) {
-				if (field[row][column].isWhite != field[nowRow][nowColumn].isWhite) {
-					if (row + 1 < SIZE && column + 1 < SIZE && field[row + 1][column + 1].isEmpty) {
-						return true;
+	if (field[nowRow][nowColumn].isQueen) {
+		for (int i = 1; i < SIZE; i++) {
+			int row = nowRow + i;
+			int column = nowColumn + i;
+			if (row >= 0 && column >= 0 && row < SIZE && column < SIZE) {
+				if (!field[row][column].isEmpty) {
+					if (field[row][column].isWhite != field[nowRow][nowColumn].isWhite) {
+						if (row + 1 < SIZE && column + 1 < SIZE && field[row + 1][column + 1].isEmpty) {
+							return true;
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
-	}
-	for (int i = 1; i < SIZE; i++) {
-		int row = nowRow + i;
-		int column = nowColumn - i;
-		if (row >= 0 && column >= 0 && row < SIZE && column < SIZE) {
-			if (!field[row][column].isEmpty) {
-				if (field[row][column].isWhite != field[nowRow][nowColumn].isWhite) {
-					if (row + 1 < SIZE && column - 1 >= 0 && field[row + 1][column - 1].isEmpty) {
-						return true;
+		for (int i = 1; i < SIZE; i++) {
+			int row = nowRow + i;
+			int column = nowColumn - i;
+			if (row >= 0 && column >= 0 && row < SIZE && column < SIZE) {
+				if (!field[row][column].isEmpty) {
+					if (field[row][column].isWhite != field[nowRow][nowColumn].isWhite) {
+						if (row + 1 < SIZE && column - 1 >= 0 && field[row + 1][column - 1].isEmpty) {
+							return true;
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
-	}
-	for (int i = 1; i < SIZE; i++) {
-		int row = nowRow - i;
-		int column = nowColumn - i;
-		if (row >= 0 && column >= 0 && row < SIZE && column < SIZE) {
-			if (!field[row][column].isEmpty) {
-				if (field[row][column].isWhite != field[nowRow][nowColumn].isWhite) {
-					if (row - 1 >= 0 && column - 1 >= 0 && field[row - 1][column - 1].isEmpty) {
-						return true;
+		for (int i = 1; i < SIZE; i++) {
+			int row = nowRow - i;
+			int column = nowColumn - i;
+			if (row >= 0 && column >= 0 && row < SIZE && column < SIZE) {
+				if (!field[row][column].isEmpty) {
+					if (field[row][column].isWhite != field[nowRow][nowColumn].isWhite) {
+						if (row - 1 >= 0 && column - 1 >= 0 && field[row - 1][column - 1].isEmpty) {
+							return true;
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
-	}
-	for (int i = 1; i < SIZE; i++) {
-		int row = nowRow - i;
-		int column = nowColumn + i;
-		if (row >= 0 && column >= 0 && row < SIZE && column < SIZE) {
-			if (!field[row][column].isEmpty) {
-				if (field[row][column].isWhite != field[nowRow][nowColumn].isWhite) {
-					if (row - 1 >= 0 && column + 1 < SIZE && field[row - 1][column + 1].isEmpty) {
-						return true;
+		for (int i = 1; i < SIZE; i++) {
+			int row = nowRow - i;
+			int column = nowColumn + i;
+			if (row >= 0 && column >= 0 && row < SIZE && column < SIZE) {
+				if (!field[row][column].isEmpty) {
+					if (field[row][column].isWhite != field[nowRow][nowColumn].isWhite) {
+						if (row - 1 >= 0 && column + 1 < SIZE && field[row - 1][column + 1].isEmpty) {
+							return true;
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
 	}
@@ -445,7 +446,8 @@ int main() {
 	cout << "Write nickname of second player (black)" << endl;
 	cin >> secondPlayer;
 
-	//startingField(field);
+	startingField(field);
+	/*
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < SIZE; j++) {
 			field[i][j].space = EMPTY;
@@ -453,8 +455,9 @@ int main() {
 			field[i][j].isQueen = false;
 		}
 	}
+	*/
 
-	field[0][7].isQueen = true;
+	/*field[0][7].isQueen = true;
 	field[0][7].isWhite = true;
 	field[0][7].isEmpty = false;
 	field[0][7].space = CHECKER;
@@ -477,7 +480,7 @@ int main() {
 
 	field[5][6].isWhite = false;
 	field[5][6].isEmpty = false;
-	field[5][6].space = CHECKER;
+	field[5][6].space = CHECKER; */
 
 	bool isHit = false;
 	while (!out(field)) {
